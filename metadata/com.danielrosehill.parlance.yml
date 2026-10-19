@@ -1,0 +1,12 @@
+Categories:
+  - Writing
+AuthorName: Daniel Rosehill
+SourceCode: https://github.com/danielrosehill/Parlance-Dictation
+IssueTracker: https://github.com/danielrosehill/Parlance-Dictation/issues
+
+Name: Parlance
+Summary: On-device dictation with NVIDIA Parakeet
+Description: |-
+  General-purpose on-device dictation with NVIDIA Parakeet, with a choice of model
+  (stock or fine-tunes). The general-purpose sibling of Hebrish. Transcription runs
+  entirely on the phone.

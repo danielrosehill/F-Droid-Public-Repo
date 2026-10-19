@@ -1,0 +1,35 @@
+# Apps published to the public F-Droid repo at https://apps.bydanielrosehill.com/fdroid/repo
+#
+# Each entry is a GitHub repo whose releases carry a signed APK. scripts/sync_releases.py
+# takes the newest non-draft release that has an APK asset matching `asset` (and whose
+# tag starts with `tag_prefix`, if set) and stages it as repo/<package>_<tag>.apk.
+#
+# Only release-signed APKs belong here. A debug-signed build (CN=Android Debug) is
+# signed with whatever ~/.android/debug.keystore the build machine had, so the next
+# build from a different runner has a different key and Android refuses the update.
+#
+# APKs published by hand (no GitHub release) need no entry: upload them straight to
+# s3://apps-public/fdroid/repo/ and add metadata/<package>.yml. See README.
+
+apps:
+  - repo: Hebrish-ASR/Hebrish-Dictation
+    package: app.hebrish.dictation
+    tag_prefix: android-
+
+  - repo: danielrosehill/Parlance-Dictation
+    package: com.danielrosehill.parlance
+    tag_prefix: android-
+
+  - repo: danielrosehill/Family-First-Aid-Android
+    package: com.danielrosehill.firstaid
+
+  - repo: My-Weird-Prompts/MWP-FM-Android
+    package: com.myweirdprompts.fm
+
+# Held back until they ship a release-signed APK (checked 2026-10-20):
+#   danielrosehill/Voxcast              com.danielrosehill.voxcast        debug key, not debuggable
+#   danielrosehill/Driving-Checklists   com.danielrosehill.drivingchecklists  debug key
+#   danielrosehill/Readiness-Voice-Agent com.readiness.voiceagent         debug key, 113 MB
+#   danielrosehill/Family-Page          com.danielrosehill.familypager    debuggable debug build
+#   danielrosehill/Israel-Alert-Map     com.danielrosehill.israelgeomap   debuggable debug build
+#   danielrosehill/Israel-Geomap-APK    com.danielrosehill.israelgeomap   same package id as Israel-Alert-Map

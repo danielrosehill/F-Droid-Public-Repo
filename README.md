@@ -1,0 +1,104 @@
+# F-Droid-Public-Repo
+
+Public [F-Droid](https://f-droid.org) repository for Daniel Rosehill's Android apps.
+Static files on Cloudflare R2, rebuilt by GitHub Actions.
+
+**Add it to F-Droid / Droid-ify / Neo Store:**
+
+<https://fdroid.link/#https://apps.bydanielrosehill.com/fdroid/repo?fingerprint=35E988F3234F668852138206EB237FCF3F1FA3F4981077DE1B269E81BE1B74E7>
+
+| | |
+|---|---|
+| Repo URL | `https://apps.bydanielrosehill.com/fdroid/repo` |
+| Web page + QR | <https://apps.bydanielrosehill.com/fdroid/repo/index.html> |
+| Signing key SHA-256 | `35E988F3234F668852138206EB237FCF3F1FA3F4981077DE1B269E81BE1B74E7` |
+| Bucket | R2 `apps-public` (account `81ee9810726226b99b56e4d84ffac020`), custom domain `apps.bydanielrosehill.com`, prefix `fdroid/` |
+
+## How it works
+
+```
+app repo: tag → CI builds release-signed APK → GitHub release
+                                   │  (hourly cron / push / dispatch)
+this repo: scripts/sync_releases.py  stages any release APK the bucket lacks
+           scripts/build.sh          pulls published APKs, `fdroid update`, syncs to R2
+```
+
+- `apps.yml` lists the GitHub repos to track (`repo`, `package`, optional `tag_prefix`
+  for repos that also release desktop builds). The newest non-draft release with an
+  APK asset is staged as `repo/<package>_<tag>.apk`. Presence of that filename in the
+  bucket (`repo/` or `archive/`) is the only state: no state file.
+- `metadata/<package>.yml` holds store text (name, summary, description, links).
+- `config.yml` is the fdroidserver config. Secrets come from env (`{env: ...}`).
+- `archive_older: 3`: three versions per app stay in `repo/`, older ones move to
+  `archive/`.
+- Upload order: APKs first, index last, so a client never sees an index entry whose
+  file is missing.
+- The workflow commits back skeleton metadata that `fdroid update -c` writes for a
+  hand-uploaded APK.
+
+### Triggers
+
+| Event | Rebuilds index |
+|---|---|
+| hourly cron | only if a new release was found |
+| push to `apps.yml`, `metadata/**`, `config.yml`, `scripts/**` | always |
+| `gh workflow run publish.yml -R danielrosehill/F-Droid-Public-Repo` | always (input `force`, default true) |
+| `repository_dispatch` type `publish` | always |
+
+## Adding an app
+
+**From GitHub releases:** add an entry to `apps.yml` and a `metadata/<package>.yml`,
+push. The push triggers a publish.
+
+**One-off APK (no release):** upload it to `s3://apps-public/fdroid/repo/<package>_<version>.apk`,
+add `metadata/<package>.yml`, push (or `gh workflow run publish.yml`).
+
+The private `fdroid-publisher` Claude plugin
+(`danielrosehill/Claude-FDroid-Publisher-Plugin`) wraps both.
+
+### Requirements for an APK
+
+- **Release-signed with a stable key.** A `CN=Android Debug` signature comes from
+  whichever machine built it. The next build from a different runner has a different
+  key, and Android refuses the update. Check with
+  `keytool -printcert -jarfile app.apk` or `apksigner verify --print-certs`.
+- `versionCode` must increase every release. An equal code with a different file
+  breaks updates for installed users.
+- One package id per app. `Israel-Alert-Map` and `Israel-Geomap-APK` both ship
+  `com.danielrosehill.israelgeomap`, so only one of them can be listed.
+
+## Secrets
+
+| GitHub | Value | Source |
+|---|---|---|
+| secret `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` | R2 S3 token for `apps-public` | 1Password `API Keys & Programmatic` → "Public Apps R2 Bucket API Key" (`username` / `credential`) |
+| secret `FDROID_KEYSTORE_B64` | base64 of the repo keystore | 1Password `Daniel - Personal` → document "Android signing key - F-Droid Repo (public)" |
+| secret `FDROID_KEYSTORE_PASS` | keystore + key password (alias `fdroid-public`) | 1Password `Daniel - Personal` → "Android signing key - F-Droid Repo (public) - password" |
+| variable `R2_ACCOUNT_ID` | `81ee9810726226b99b56e4d84ffac020` | |
+| secret `RELEASES_READ_TOKEN` (optional) | PAT that can read private app repos' releases | not set; `github.token` reads public repos |
+
+Local copy of the keystore: `~/.config/android-signing/fdroid-repo-public.p12` (+ `.pass`).
+**Losing the repo key means every user has to remove and re-add the repo.**
+
+`op://` references can't use the vault name `API Keys & Programmatic`. `op` rejects
+the `&` as an invalid character. Use the vault id `k6bqzdeflgcb44rqc64y2p2aha`.
+
+## Running locally
+
+```bash
+cp ~/.config/android-signing/fdroid-repo-public.p12 keystore.p12
+V=k6bqzdeflgcb44rqc64y2p2aha I=4k6mo5srumwmxukh56zyu6l6ui
+export AWS_ACCESS_KEY_ID=$(op read "op://$V/$I/username") AWS_SECRET_ACCESS_KEY=$(op read "op://$V/$I/credential") \
+  R2_ACCOUNT_ID=81ee9810726226b99b56e4d84ffac020 \
+  FDROID_KEYSTORE_PASS=$(cat ~/.config/android-signing/fdroid-repo-public.pass) GH_TOKEN=$(gh auth token)
+FORCE=1 scripts/build.sh
+```
+
+Needs `fdroid` (`uv tool install fdroidserver`, 2.4.5 verified), `aws`, `gh`, and
+`apksigner` under `$ANDROID_HOME/build-tools`.
+
+## History
+
+- 2026-10-20: created. First publish run locally, then handed to CI. Held back as
+  debug-signed: Voxcast, Driving-Checklists, Readiness-Voice-Agent, Family-Page,
+  Israel-Alert-Map, Israel-Geomap-APK (details in `apps.yml`).

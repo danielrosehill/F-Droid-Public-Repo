@@ -1,0 +1,13 @@
+Categories:
+  - Science & Education
+AuthorName: Daniel Rosehill
+SourceCode: https://github.com/danielrosehill/Family-First-Aid-Android
+IssueTracker: https://github.com/danielrosehill/Family-First-Aid-Android/issues
+
+Name: Family First Aid
+Summary: Offline first-aid protocols and drills for families in Israel
+Description: |-
+  Offline first-aid app for families in Israel (MDA / Hatzalah): adult and child
+  protocols, interactive decision flows and spaced review.
+
+  Not medical advice. In an emergency call 101.
