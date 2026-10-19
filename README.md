@@ -128,3 +128,8 @@ A second, personal F-Droid repo is planned but nothing serves it yet. Status on
   files are now uploaded with `Cache-Control: public, max-age=60`. Reproduce or verify
   with fdroidserver's own client code:
   `python -c "import fdroidserver.common as c, fdroidserver.index as i; c.config={'jarsigner':'/usr/bin/jarsigner'}; i.download_repo_index_v2('<repo url>?fingerprint=<fp>')"`.
+- 2026-10-20, open: `apps.danielrosehill.com` used to be the Vercel `Apps-Microsite` domain.
+  It now serves this bucket, so the microsite is only reachable at `apps-microsite.vercel.app`,
+  and the "Apps & Tools" / "Apps" links on danielrosehill.com/projects hit a 404 at this
+  host's root. Deferred by Daniel (microsite low priority). The likely fix is a Cloudflare
+  redirect rule that sends everything outside `/fdroid/` to the microsite.
