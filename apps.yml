@@ -1,4 +1,4 @@
-# Apps published to the public F-Droid repo at https://apps.bydanielrosehill.com/fdroid/repo
+# Apps published to the public F-Droid repo at https://apps.danielrosehill.com/fdroid/repo
 #
 # Each entry is a GitHub repo whose releases carry a signed APK. scripts/sync_releases.py
 # takes the newest non-draft release that has an APK asset matching `asset` (and whose
