@@ -97,6 +97,25 @@ FORCE=1 scripts/build.sh
 Needs `fdroid` (`uv tool install fdroidserver`, 2.4.5 verified), `aws`, `gh`, and
 `apksigner` under `$ANDROID_HOME/build-tools`.
 
+## Private repo (planned, not built)
+
+A second, personal F-Droid repo is planned but nothing serves it yet. Status on
+2026-10-20:
+
+- R2 bucket **`apps-private`** exists (created by Daniel), with no public access
+  and no custom domain. It is empty.
+- Distribution is undecided. The leading option is a Cloudflare Worker on its own
+  hostname that serves the bucket behind HTTP basic auth. F-Droid clients accept
+  `https://user:pass@host/fdroid/repo`. Cloudflare Access won't work, because
+  store apps can't complete a browser login.
+- If built, it reuses these scripts unchanged: set the repo variable
+  `R2_BUCKET=apps-private`, give it its own repo signing key and an R2 token scoped
+  to `apps-private`, and set `RELEASES_READ_TOKEN` to read private app repos.
+  Usable tokens for provisioning are in 1Password `API Keys & Programmatic`:
+  "Cloudflare API Token Mgmt" (field `tgguaykxu4krh4qzanhxzrr3d4`, can mint R2
+  tokens) and "Cloudflare Workers API Token" (`password`). Both verified active
+  2026-10-20.
+
 ## History
 
 - 2026-10-20: created. First publish run locally, then handed to CI. Held back as
