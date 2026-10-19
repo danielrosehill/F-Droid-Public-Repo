@@ -5,19 +5,23 @@
 # Env: AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY (R2 token scoped to apps-public),
 #      R2_ACCOUNT_ID, FDROID_KEYSTORE_PASS, GH_TOKEN; keystore.p12 in the repo root.
 #      FORCE=1 rebuilds the index even when no new release was found.
+#      R2_BUCKET overrides the bucket (default apps-public); the prefix is always fdroid/.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-BUCKET=s3://apps-public/fdroid
+R2_BUCKET=${R2_BUCKET:-apps-public}
+BUCKET=s3://$R2_BUCKET/fdroid
 export AWS_DEFAULT_REGION=auto
-S3=(aws s3 --endpoint-url "https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com" --only-show-errors)
+ENDPOINT="https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
+S3=(aws s3 --endpoint-url "$ENDPOINT" --only-show-errors)
 
-# 1. What is already published (repo + archive).
+# 1. What is already published (repo + archive). Fails loudly: a listing error must
+#    not read as "bucket empty", or every run republishes everything.
 mkdir -p tmp
-: > tmp/existing.txt
-for d in repo archive; do
-  "${S3[@]}" ls "$BUCKET/$d/" 2>/dev/null | awk '{print $4}' | grep '\.apk$' >> tmp/existing.txt || true
-done
+aws s3api list-objects-v2 --endpoint-url "$ENDPOINT" --bucket "$R2_BUCKET" --prefix fdroid/ \
+  --query 'Contents[].Key' --output text > tmp/keys.txt
+tr '\t' '\n' < tmp/keys.txt | grep '\.apk$' | xargs -rn1 basename > tmp/existing.txt || true
+echo "$(wc -l < tmp/existing.txt) APK(s) already published"
 
 # 2. Stage new release APKs.
 GITHUB_OUTPUT=tmp/out python3 scripts/sync_releases.py --existing tmp/existing.txt --dest tmp/new

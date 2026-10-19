@@ -45,6 +45,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           R2_ACCOUNT_ID: ${{ vars.R2_ACCOUNT_ID }}
+          R2_BUCKET: ${{ vars.R2_BUCKET || 'apps-public' }}
           FDROID_KEYSTORE_PASS: ${{ secrets.FDROID_KEYSTORE_PASS }}
           GH_TOKEN: ${{ secrets.RELEASES_READ_TOKEN || github.token }}
           FORCE: ${{ (github.event_name == 'schedule') && '0' || (github.event_name == 'workflow_dispatch' && !inputs.force) && '0' || '1' }}
