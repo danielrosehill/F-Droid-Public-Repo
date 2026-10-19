@@ -53,8 +53,11 @@ push. The push triggers a publish.
 **One-off APK (no release):** upload it to `s3://apps-public/fdroid/repo/<package>_<version>.apk`,
 add `metadata/<package>.yml`, push (or `gh workflow run publish.yml`).
 
-The private `fdroid-publisher` Claude plugin
-(`danielrosehill/Claude-FDroid-Publisher-Plugin`) wraps both.
+The private `software-publisher` Claude plugin
+(`danielrosehill/Claude-Software-Publisher-Plugin`, named `fdroid-publisher` until
+2026-10-20) wraps both. Its `deb-*` skills drive the sibling APT repo,
+[`APT-Public-Repo`](https://github.com/danielrosehill/APT-Public-Repo), served from the same
+bucket under `apt/`.
 
 ### Requirements for an APK
 
