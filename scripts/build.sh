@@ -43,8 +43,15 @@ fdroid update -c --pretty
 
 # 5. Publish: APKs and icons first, index last, so a client never sees an index
 #    pointing at a file that is not there yet.
+#    Index files get a 60 s Cache-Control. Without it Cloudflare's edge caches
+#    entry.jar (a .jar is a default-cacheable extension) for 4 h but never caches
+#    the .json, so after any rebuild clients get an old signed entry.jar beside a new
+#    index-v2.json. The hash check then fails, and F-Droid reports it as a bad
+#    fingerprint. Seen 2026-10-20.
+INDEX=(--exclude '*' --include 'index*' --include 'entry*' --include 'diff/*')
 for d in repo archive; do
   "${S3[@]}" sync "$d/" "$BUCKET/$d/" --exclude 'index*' --exclude 'entry*' --exclude 'diff/*'
+  "${S3[@]}" sync "$d/" "$BUCKET/$d/" "${INDEX[@]}" --cache-control 'public, max-age=60' --exact-timestamps
   "${S3[@]}" sync "$d/" "$BUCKET/$d/" --delete
 done
 echo "Published $staged new APK(s)."

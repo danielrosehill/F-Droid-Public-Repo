@@ -5,14 +5,14 @@ Static files on Cloudflare R2, rebuilt by GitHub Actions.
 
 **Add it to F-Droid / Droid-ify / Neo Store:**
 
-<https://fdroid.link/#https://apps.bydanielrosehill.com/fdroid/repo?fingerprint=35E988F3234F668852138206EB237FCF3F1FA3F4981077DE1B269E81BE1B74E7>
+<https://fdroid.link/#https://apps.danielrosehill.com/fdroid/repo?fingerprint=35E988F3234F668852138206EB237FCF3F1FA3F4981077DE1B269E81BE1B74E7>
 
 | | |
 |---|---|
-| Repo URL | `https://apps.bydanielrosehill.com/fdroid/repo` |
-| Web page + QR | <https://apps.bydanielrosehill.com/fdroid/repo/index.html> |
+| Repo URL | `https://apps.danielrosehill.com/fdroid/repo` |
+| Web page + QR | <https://apps.danielrosehill.com/fdroid/repo/index.html> |
 | Signing key SHA-256 | `35E988F3234F668852138206EB237FCF3F1FA3F4981077DE1B269E81BE1B74E7` |
-| Bucket | R2 `apps-public` (account `81ee9810726226b99b56e4d84ffac020`), custom domain `apps.bydanielrosehill.com`, prefix `fdroid/` |
+| Bucket | R2 `apps-public` (account `81ee9810726226b99b56e4d84ffac020`), custom domain `apps.danielrosehill.com`, prefix `fdroid/` |
 
 ## How it works
 
@@ -121,3 +121,10 @@ A second, personal F-Droid repo is planned but nothing serves it yet. Status on
 - 2026-10-20: created. First publish run locally, then handed to CI. Held back as
   debug-signed: Voxcast, Driving-Checklists, Readiness-Voice-Agent, Family-Page,
   Israel-Alert-Map, Israel-Geomap-APK (details in `apps.yml`).
+- 2026-10-20: moved to `apps.danielrosehill.com`. `apps.bydanielrosehill.com` still
+  serves the same bucket, but the index names the new host. Fixed a "bad fingerprint"
+  error on first add. Cloudflare cached the signed `entry.jar` (4 h edge TTL for
+  `.jar`) but not `index-v2.json`, so their hashes disagreed after a rebuild. Index
+  files are now uploaded with `Cache-Control: public, max-age=60`. Reproduce or verify
+  with fdroidserver's own client code:
+  `python -c "import fdroidserver.common as c, fdroidserver.index as i; c.config={'jarsigner':'/usr/bin/jarsigner'}; i.download_repo_index_v2('<repo url>?fingerprint=<fp>')"`.

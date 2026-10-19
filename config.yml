@@ -1,7 +1,7 @@
 # fdroidserver config. Secrets come from the environment (set by the workflow from
 # GitHub secrets); keystore.p12 is decoded from FDROID_KEYSTORE_B64 at run time and
 # is git-ignored.
-repo_url: https://apps.bydanielrosehill.com/fdroid/repo
+repo_url: https://apps.danielrosehill.com/fdroid/repo
 repo_name: Daniel Rosehill Apps
 repo_icon: icon.png
 repo_description: >-
@@ -9,7 +9,7 @@ repo_description: >-
   Includes Hebrish and Parlance on-device dictation.
 
 archive_older: 3
-archive_url: https://apps.bydanielrosehill.com/fdroid/archive
+archive_url: https://apps.danielrosehill.com/fdroid/archive
 archive_name: Daniel Rosehill Apps (archive)
 archive_description: Older versions of apps in the Daniel Rosehill Apps repo.
 
