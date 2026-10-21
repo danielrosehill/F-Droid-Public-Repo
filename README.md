@@ -100,24 +100,20 @@ FORCE=1 scripts/build.sh
 Needs `fdroid` (`uv tool install fdroidserver`, 2.4.5 verified), `aws`, `gh`, and
 `apksigner` under `$ANDROID_HOME/build-tools`.
 
-## Private repo (planned, not built)
+## Private siblings
 
-A second, personal F-Droid repo is planned but nothing serves it yet. Status on
-2026-10-20:
+Two private F-Droid repos run the same scripts with a different default bucket. Both were
+scaffolded on 2026-10-21 and are **not served yet**: no host, no access control, no R2
+token.
 
-- R2 bucket **`apps-private`** exists (created by Daniel), with no public access
-  and no custom domain. It is empty.
-- Distribution is undecided. The leading option is a Cloudflare Worker on its own
-  hostname that serves the bucket behind HTTP basic auth. F-Droid clients accept
-  `https://user:pass@host/fdroid/repo`. Cloudflare Access won't work, because
-  store apps can't complete a browser login.
-- If built, it reuses these scripts unchanged: set the repo variable
-  `R2_BUCKET=apps-private`, give it its own repo signing key and an R2 token scoped
-  to `apps-private`, and set `RELEASES_READ_TOKEN` to read private app repos.
-  Usable tokens for provisioning are in 1Password `API Keys & Programmatic`:
-  "Cloudflare API Token Mgmt" (field `tgguaykxu4krh4qzanhxzrr3d4`, can mint R2
-  tokens) and "Cloudflare Workers API Token" (`password`). Both verified active
-  2026-10-20.
+| Repo | Audience | Bucket |
+|---|---|---|
+| [`F-Droid-Private-Repo`](https://github.com/danielrosehill/F-Droid-Private-Repo) | Daniel only | `apps-private` |
+| [`F-Droid-Household-Repo`](https://github.com/danielrosehill/F-Droid-Household-Repo) (Rosehill Household Repo) | the household | `apps-household` |
+
+Each README has a status table and the open access-control question. The leading option
+is a Cloudflare Worker with HTTP basic auth, because store clients can't do a Cloudflare
+Access login.
 
 ## History
 
