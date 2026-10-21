@@ -47,6 +47,10 @@ this repo: scripts/sync_releases.py  stages any release APK the bucket lacks
   "nothing new" exit, so the hourly cron also rebuilds when something is due for pruning.
   Without the prune, removing an app from `apps.yml` does nothing: build.sh pulls every
   published APK back before `fdroid update`.
+  A pruned APK that someone fetched recently can still be served from Cloudflare's edge
+  for up to 4 h (APKs get `cache-control: max-age=14400`, `cf-cache-status: HIT`), although
+  R2 no longer has it and no index lists it. Seen 2026-10-21 for Hebrish 0.7.2; a
+  cache-busting query string (`?x=1`) shows the true 404. No purge step exists in CI.
 - **Landing page** (`scripts/build_landing.py`, added 2026-10-21): built from the fresh
   `repo/index-v2.json` (name, package, latest version, summary, source link; all text
   HTML-escaped), with the Add-to-F-Droid link, address, fingerprint, the Hebrish note and a
