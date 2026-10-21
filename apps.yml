@@ -12,10 +12,6 @@
 # s3://apps-public/fdroid/repo/ and add metadata/<package>.yml. See README.
 
 apps:
-  - repo: Hebrish-ASR/Hebrish-Dictation
-    package: app.hebrish.dictation
-    tag_prefix: android-
-
   - repo: danielrosehill/Parlance-Dictation
     package: com.danielrosehill.parlance
     tag_prefix: android-
@@ -26,6 +22,10 @@ apps:
   - repo: My-Weird-Prompts/MWP-FM-Android
     package: com.myweirdprompts.fm
 
+# Removed 2026-10-21: Hebrish-ASR/Hebrish-App (app.hebrish.dictation). Hebrish has its own
+# F-Droid repo, https://fdroid.hebrish.app/repo. scripts/prune_unlisted.py deletes the
+# APKs of any package that is neither listed here nor has metadata/<package>.yml.
+#
 # Held back until they ship a release-signed APK (checked 2026-10-20):
 #   danielrosehill/Voxcast              com.danielrosehill.voxcast        debug key, not debuggable
 #   danielrosehill/Driving-Checklists   com.danielrosehill.drivingchecklists  debug key

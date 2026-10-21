@@ -6,7 +6,7 @@ repo_name: Daniel Rosehill Apps
 repo_icon: icon.png
 repo_description: >-
   Android apps by Daniel Rosehill, built from their public GitHub repositories.
-  Includes Hebrish and Parlance on-device dictation.
+  Includes Parlance on-device dictation.
 
 archive_older: 3
 archive_url: https://apps.danielrosehill.com/fdroid/archive

@@ -10,6 +10,7 @@ Static files on Cloudflare R2, rebuilt by GitHub Actions.
 | | |
 |---|---|
 | Repo URL | `https://apps.danielrosehill.com/fdroid/repo` |
+| Landing page | <https://apps.danielrosehill.com/fdroid/> (generated each publish, see below) |
 | Web page + QR | <https://apps.danielrosehill.com/fdroid/repo/index.html> |
 | Signing key SHA-256 | `35E988F3234F668852138206EB237FCF3F1FA3F4981077DE1B269E81BE1B74E7` |
 | Bucket | R2 `apps-public` (account `81ee9810726226b99b56e4d84ffac020`), custom domain `apps.danielrosehill.com`, prefix `fdroid/` |
@@ -20,7 +21,9 @@ Static files on Cloudflare R2, rebuilt by GitHub Actions.
 app repo: tag → CI builds release-signed APK → GitHub release
                                    │  (hourly cron / push / dispatch)
 this repo: scripts/sync_releases.py  stages any release APK the bucket lacks
-           scripts/build.sh          pulls published APKs, `fdroid update`, syncs to R2
+           scripts/build.sh          pulls published APKs, prunes unlisted apps,
+                                     `fdroid update`, syncs to R2
+           scripts/build_landing.py  writes fdroid/index.html from repo/index-v2.json
 ```
 
 - `apps.yml` lists the GitHub repos to track (`repo`, `package`, optional `tag_prefix`
@@ -33,6 +36,24 @@ this repo: scripts/sync_releases.py  stages any release APK the bucket lacks
   `archive/`.
 - Upload order: APKs first, index last, so a client never sees an index entry whose
   file is missing.
+- **Prune** (`scripts/prune_unlisted.py`, added 2026-10-21): after the published APKs are
+  pulled, any APK whose package id (read from the APK with fdroidserver's `get_apk_id`,
+  not from its file name) is neither in `apps.yml` nor has a `metadata/<package>.yml` is
+  deleted from `repo/` and `archive/`, along with anything fdroid generated for it
+  (`repo/<package>/`, `icons*/<package>.*`). The final `aws s3 sync --delete` then removes
+  them from the bucket and logs each `delete:`. The metadata rule keeps one-off
+  hand-uploaded APKs, which have metadata but no `apps.yml` entry. If `apps.yml` yields no
+  packages, nothing is pruned. A file-name pre-check (`--check`) runs before the early
+  "nothing new" exit, so the hourly cron also rebuilds when something is due for pruning.
+  Without the prune, removing an app from `apps.yml` does nothing: build.sh pulls every
+  published APK back before `fdroid update`.
+- **Landing page** (`scripts/build_landing.py`, added 2026-10-21): built from the fresh
+  `repo/index-v2.json` (name, package, latest version, summary, source link; all text
+  HTML-escaped), with the Add-to-F-Droid link, address, fingerprint, the Hebrish note and a
+  link to the APT sibling. It is uploaded twice with a 60 s cache: as `fdroid/index.html`
+  and as the object keyed `fdroid/`, because R2's custom domain serves no directory index;
+  a key ending in `/` is what answers `https://apps.danielrosehill.com/fdroid/` (same trick
+  as `apt/` in `APT-Public-Repo`).
 - The workflow commits back skeleton metadata that `fdroid update -c` writes for a
   hand-uploaded APK.
 
@@ -58,6 +79,12 @@ The private `software-publisher` Claude plugin
 2026-10-20) wraps both. Its `deb-*` skills drive the sibling APT repo,
 [`APT-Public-Repo`](https://github.com/danielrosehill/APT-Public-Repo), served from the same
 bucket under `apt/`.
+
+## Removing an app
+
+Delete its `apps.yml` entry **and** `metadata/<package>.yml`, push. The publish prunes its
+APKs from the bucket (`repo/` and `archive/`). Installed copies stay on users' phones, but
+F-Droid shows no further updates for them from this repo.
 
 ### Requirements for an APK
 
@@ -127,6 +154,16 @@ Access login.
   files are now uploaded with `Cache-Control: public, max-age=60`. Reproduce or verify
   with fdroidserver's own client code:
   `python -c "import fdroidserver.common as c, fdroidserver.index as i; c.config={'jarsigner':'/usr/bin/jarsigner'}; i.download_repo_index_v2('<repo url>?fingerprint=<fp>')"`.
+- 2026-10-21: **Hebrish dropped** (`app.hebrish.dictation`, repo `Hebrish-ASR/Hebrish-App`,
+  formerly `Hebrish-Dictation`). Reason: Hebrish has its own F-Droid repo,
+  `https://fdroid.hebrish.app/repo` (fingerprint
+  `EF8C2D63D994A10CD489A978585510B47E47452EC09248591CB2C0F39C2BC1FA`, instructions
+  <https://hebrish.app/download#fdroid>), which also carries Hebrish Keyboard. Users who
+  installed Hebrish from this repo keep the app, but F-Droid shows them no more updates
+  from here; they should add the Hebrish repo to keep getting them. The landing page says
+  so. Its five APKs (0.2.2 and 0.3.0 in `archive/`, 0.4.0, 0.6.0, 0.7.2 in `repo/`) were
+  removed by the new prune. Same day: the landing page at `/fdroid/` (was a 404). The
+  sibling APT repo got the same treatment the same day.
 - 2026-10-20, open: `apps.danielrosehill.com` used to be the Vercel `Apps-Microsite` domain.
   It now serves this bucket, so the microsite is only reachable at `apps-microsite.vercel.app`,
   and the "Apps & Tools" / "Apps" links on danielrosehill.com/projects hit a 404 at this
