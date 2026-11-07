@@ -16,19 +16,18 @@ apps:
     package: com.danielrosehill.parlance
     tag_prefix: android-
 
-  - repo: danielrosehill/Parlance-Keyboard
-    package: com.danielrosehill.parlance.keyboard
-    tag_prefix: v
-
   - repo: danielrosehill/Family-First-Aid-Android
     package: com.danielrosehill.firstaid
-
-  - repo: My-Weird-Prompts/MWP-FM-Android
-    package: com.myweirdprompts.fm
 
   - repo: danielrosehill/Local-UTC-Widget
     package: com.danielrosehill.localutcwidget
 
+# Removed 2026-11-07: My-Weird-Prompts/MWP-FM-Android (com.myweirdprompts.fm, the TWA). The native
+# player com.myweirdprompts.fm.player on https://cdn.myweirdprompts.com/fdroid/repo replaces it.
+#
+# On hold since 2026-11-07: danielrosehill/Parlance-Keyboard (com.danielrosehill.parlance.keyboard).
+# It has never had a release: its one build failed on 2026-10-20.
+#
 # Removed 2026-10-21: Hebrish-ASR/Hebrish-App (app.hebrish.dictation). Hebrish has its own
 # F-Droid repo, https://fdroid.hebrish.app/repo. scripts/prune_unlisted.py deletes the
 # APKs of any package that is neither listed here nor has metadata/<package>.yml.
