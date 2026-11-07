@@ -16,6 +16,10 @@ apps:
     package: com.danielrosehill.parlance
     tag_prefix: android-
 
+  - repo: danielrosehill/Parlance-Keyboard
+    package: com.danielrosehill.parlance.keyboard
+    tag_prefix: v
+
   - repo: danielrosehill/Family-First-Aid-Android
     package: com.danielrosehill.firstaid
 

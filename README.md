@@ -19,7 +19,7 @@ Static files on Cloudflare R2, rebuilt by GitHub Actions.
 
 ```
 app repo: tag → CI builds release-signed APK → GitHub release
-                                   │  (hourly cron / push / dispatch)
+                                   │  (weekly cron / push / dispatch)
 this repo: scripts/sync_releases.py  stages any release APK the bucket lacks
            scripts/build.sh          pulls published APKs, prunes unlisted apps,
                                      `fdroid update`, syncs to R2
@@ -44,7 +44,7 @@ this repo: scripts/sync_releases.py  stages any release APK the bucket lacks
   them from the bucket and logs each `delete:`. The metadata rule keeps one-off
   hand-uploaded APKs, which have metadata but no `apps.yml` entry. If `apps.yml` yields no
   packages, nothing is pruned. A file-name pre-check (`--check`) runs before the early
-  "nothing new" exit, so the hourly cron also rebuilds when something is due for pruning.
+  "nothing new" exit, so the weekly cron also rebuilds when something is due for pruning.
   Without the prune, removing an app from `apps.yml` does nothing: build.sh pulls every
   published APK back before `fdroid update`.
   A pruned APK that someone fetched recently can still be served from Cloudflare's edge
@@ -65,7 +65,7 @@ this repo: scripts/sync_releases.py  stages any release APK the bucket lacks
 
 | Event | Rebuilds index |
 |---|---|
-| hourly cron | only if a new release was found |
+| weekly cron (Monday 03:17 UTC, hourly until 2026-11-07) | only if a new release was found |
 | push to `apps.yml`, `metadata/**`, `config.yml`, `scripts/**` | always |
 | `gh workflow run publish.yml -R danielrosehill/F-Droid-Public-Repo` | always (input `force`, default true) |
 | `repository_dispatch` type `publish` | always |

@@ -2,7 +2,7 @@ name: Publish F-Droid repo
 
 on:
   schedule:
-    - cron: "17 * * * *"   # hourly: picks up new GitHub releases of apps in apps.yml
+    - cron: "17 3 * * 1"   # weekly, Monday 03:17 UTC: a fallback only, because releases are rare and publishing is triggered by hand or dispatch
   push:
     branches: [main]
     paths: [apps.yml, config.yml, icon.png, "metadata/**", "scripts/**", ".github/workflows/publish.yml"]

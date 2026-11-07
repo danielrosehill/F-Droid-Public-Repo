@@ -6,7 +6,7 @@ Usage:
       Filename-only pre-check, run before anything is downloaded. Prints and writes
       `orphans=<n>`: published APKs whose name does not start with "<kept package>_".
       It never deletes anything; it only tells build.sh that a rebuild is due (so the
-      hourly cron run, which otherwise exits when no release is new, still prunes).
+      weekly cron run, which otherwise exits when no release is new, still prunes).
   prune_unlisted.py --prune <dir> [<dir> ...]
       Reads each APK's real package id (fdroidserver.common.get_apk_id, so the file name
       does not matter) and deletes every APK whose package is not kept, plus anything
