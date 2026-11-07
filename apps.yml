@@ -26,6 +26,9 @@ apps:
   - repo: My-Weird-Prompts/MWP-FM-Android
     package: com.myweirdprompts.fm
 
+  - repo: danielrosehill/Local-UTC-Widget
+    package: com.danielrosehill.localutcwidget
+
 # Removed 2026-10-21: Hebrish-ASR/Hebrish-App (app.hebrish.dictation). Hebrish has its own
 # F-Droid repo, https://fdroid.hebrish.app/repo. scripts/prune_unlisted.py deletes the
 # APKs of any package that is neither listed here nor has metadata/<package>.yml.

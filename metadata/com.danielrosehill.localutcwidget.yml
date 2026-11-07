@@ -1,0 +1,18 @@
+Categories:
+  - Time
+License: MIT
+AuthorName: Daniel Rosehill
+SourceCode: https://github.com/danielrosehill/Local-UTC-Widget
+IssueTracker: https://github.com/danielrosehill/Local-UTC-Widget/issues
+
+Name: Local UTC Widget
+Summary: Home-screen widget showing local time and UTC side by side, 24-hour
+Description: |-
+  An Android home-screen widget that shows local time and UTC together, in 24-hour
+  format. The launcher icon only opens the widget's settings.
+
+  Options include the date under each clock, the UTC offset, the local time zone
+  name, three layouts, bundled fonts, three sizes and one-tap presets.
+
+  After installing, long-press the home screen, open Widgets and add Local UTC
+  Widget, or use the button in the settings screen.
